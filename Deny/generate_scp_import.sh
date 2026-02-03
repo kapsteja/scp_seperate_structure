@@ -49,8 +49,16 @@ for pid in $policies; do
     continue
   fi
 
-  # (User requested) No longer skipping AWS-managed or guardrail-named policies;
-  # all policies with names starting with 'Deny' will be processed.
+  # Fallback: some AWS-managed policies may not populate AwsManaged consistently; skip common AWS-managed names
+  if echo "$raw_name" | tr '[:upper:]' '[:lower:]' | grep -Eiq 'fullawsaccess|aws-managed|aws managed'; then
+    echo ">>> Skipping likely-AWS-managed policy by name: $raw_name (id: $pid)"
+    continue
+  fi
+  # Skip guardrails policies (case-insensitive, matches both singular and plural)
+  if echo "$raw_name" | tr '[:upper:]' '[:lower:]' | grep -q 'guardrail'; then
+    echo ">>> Skipping guardrail policy: $raw_name (id: $pid) — excluded from Terraform management"
+    continue
+  fi
 
   safe_name=$(echo "$raw_name" | tr -d '[:space:]' | tr '/:' '_' | tr -cd '[:alnum:]_-')
 
