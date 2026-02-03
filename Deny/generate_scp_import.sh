@@ -1,7 +1,17 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
 echo "=== Generating Deny SCPs (policies starting with 'Deny') ==="
+
+# Sanity checks
+if ! command -v aws >/dev/null 2>&1; then
+  echo "ERROR: aws CLI not found in PATH. Install and configure AWS CLI with proper credentials." >&2
+  exit 1
+fi
+if ! command -v jq >/dev/null 2>&1; then
+  echo "ERROR: jq not found in PATH. Install jq to parse JSON outputs." >&2
+  exit 1
+fi
 
 # Output files
 POLICIES_DIR="policies"
