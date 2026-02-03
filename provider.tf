@@ -7,17 +7,23 @@ terraform {
   }
 
   cloud {
-    organization = "YOUR_ORG_NAME"  # Replace with your Terraform Cloud org
+    organization = "YOUR_ORG_NAME"  # Replace with your Terraform Cloud organization name
 
     workspaces {
-      # Two workspaces: one for Deny, one for Others
-      # Use: terraform cloud select-workspace scp-deny or scp-others
-      name = "scp-terraform"  # Default workspace; override with TF_WORKSPACE env var
+      # This configuration uses tags to organize workspaces
+      # Create two workspaces in Terraform Cloud:
+      # 1. scp-deny (for Deny policies)
+      # 2. scp-others (for Other policies)
+      # 
+      # To switch workspaces:
+      # cd Deny && terraform workspace select scp-deny
+      # cd others && terraform workspace select scp-others
+      tags = ["scp-management"]
     }
   }
 }
 
 provider "aws" {
-  region = "us-east-1"
+  region = "us-east-1"  # Change if needed
 }
 
